@@ -21,7 +21,7 @@ function App() {
     };
 
     try {
-      var response = await fetch("http://localhost:9999/api/urls", {
+      var response = await fetch("/api/urls", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
