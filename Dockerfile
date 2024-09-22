@@ -1,13 +1,8 @@
-FROM node:18 AS build
+FROM nginx:1.19
 
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
+ENV TZ='Asia/Kolkata'
 
-FROM nginx:alpine
+COPY build .
 
-COPY --from=build /app/build /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginxmain.conf /etc/nginx/nginx.conf
