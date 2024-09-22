@@ -1,8 +1,9 @@
 import logo from "./logo.svg";
 import "./App.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams, BrowserRouter, Route, Routes } from "react-router-dom";
 
-function App() {
+const UrlInputComponent = () => {
   const [inputValue, setInputValue] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,16 +17,12 @@ function App() {
     setResponseMessage("");
     setInputValue("");
 
-    const payload = {
-      url: inputValue,
-    };
+    const payload = { url: inputValue };
 
     try {
-      var response = await fetch("/api/urls", {
+      let response = await fetch("/api/urls", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -34,7 +31,7 @@ function App() {
       }
 
       response = await response.json();
-      setResponseMessage(`Short Url : ${response.data.short_url}`);
+      setResponseMessage(`Short Url: ${response.data.short_url}`);
     } catch (error) {
       console.error("Error posting data:", error.message);
       setResponseMessage("Invalid response from backend");
@@ -54,17 +51,40 @@ function App() {
             type="text"
             value={inputValue}
             onChange={handleInputChange}
-            placeholder="Enter your url"
+            placeholder="Enter your URL"
           />
           <button onClick={handleButtonClick} disabled={loading}>
             {loading ? "Loading..." : "Submit"}
           </button>
-
           {responseMessage && <p>{responseMessage}</p>}
         </div>
       </header>
     </div>
   );
-}
+};
+
+const RedirectPage = () => {
+  const { param } = useParams();
+  useEffect(() => {
+    window.location.href = `/api/${param}`;
+  }, [param]);
+
+  return (
+    <div>
+      <p>Redirecting...</p>
+    </div>
+  );
+};
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<UrlInputComponent />} />
+        <Route path="/:param" element={<RedirectPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
 
 export default App;
